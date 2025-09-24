@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use phpDocumentor\Reflection\Types\This;
 
 class AuthService
 {
@@ -58,7 +59,7 @@ class AuthService
     }
     public function logout($user)
     {
-        $user->currentAccessToken()->delete();
+        $this->userRepository->deleteUserTokens($user);
     }
 
     public function GenerateToken(User $user)
