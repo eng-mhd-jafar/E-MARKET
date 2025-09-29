@@ -9,6 +9,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use phpDocumentor\Reflection\Types\This;
+use Laravel\Socialite\Contracts\User as SocialiteUser;
+
 
 class AuthService
 {
@@ -62,8 +64,31 @@ class AuthService
         $this->userRepository->deleteUserTokens($user);
     }
 
+    public function loginWithGoogle(SocialiteUser $googleUser)
+    {
+        $user = $this->userRepository->findByEmail($googleUser->getEmail());
+
+        if (!$user) {
+            $user = $this->userRepository->create([
+                'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
+                'email_verified_at' => now(),
+                'password' => str()->random(16),
+            ]);
+        }
+
+        $token = $this->GenerateToken($user);
+
+        return [
+            'token' => $token,
+            'user' => $user
+        ];
+    }
+
     public function GenerateToken(User $user)
     {
         return $user->createToken('api_token')->plainTextToken;
     }
+
+
 }
