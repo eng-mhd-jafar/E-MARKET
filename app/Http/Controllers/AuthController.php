@@ -7,7 +7,7 @@ use App\Http\Requests\UserCheckCodeRequest;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Resources\UserResource;
-use App\Http\Responces\ApiResponse;
+use App\Http\Helpers\ApiResponse;
 use App\Services\AuthService;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +20,7 @@ class AuthController extends Controller
     public function register(UserRegisterRequest $request)
     {
         $user = $this->authService->register($request->validated());
-        return ApiResponse::successWithData((new UserResource($user))->resource, 'The verification code has been sent to your email. Please check your email.');
+        return ApiResponse::success('The verification code has been sent to your email. Please check your email.');
     }
 
     public function CheckCode(UserCheckCodeRequest $request)
@@ -74,4 +74,6 @@ class AuthController extends Controller
             'user' => new UserResource($result['user'])
         ], 'Login with Google successful.');
     }
+
+
 }

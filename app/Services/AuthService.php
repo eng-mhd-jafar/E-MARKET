@@ -5,10 +5,8 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerificationCodeEmail;
 use App\Models\User;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use phpDocumentor\Reflection\Types\This;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 
 
@@ -21,10 +19,17 @@ class AuthService
     }
     public function register(array $data)
     {
-        $data['OTP'] = rand(1000, 9999);
-        $data['verification_code_expires_at'] = now()->addMinutes(5);
-        $user = $this->userRepository->create($data);
-        Mail::to($user->email)->send(new VerificationCodeEmail($data['OTP']));
+        try {
+            DB::beginTransaction();
+            $data['OTP'] = rand(1000, 9999);
+            $data['verification_code_expires_at'] = now()->addMinutes(5);
+            $user = $this->userRepository->create($data);
+            Mail::to($user->email)->send(new VerificationCodeEmail($data['OTP']));
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
         return $user;
     }
 
@@ -33,12 +38,11 @@ class AuthService
         $user = $this->userRepository->findByEmail($data['email']);
         if ($user && $user->OTP == $data['code']) {
             if ($user->verification_code_expires_at && now()->greaterThan($user->verification_code_expires_at)) {
-                return null; // الكود منتهي الصلاحية
+                return null;
             }
             $this->userRepository->markEmailAsVerified($user);
-            $token = $this->GenerateToken($user);
             return [
-                'token' => $token,
+                'token' => $this->GenerateToken($user),
             ];
         }
         return null;
