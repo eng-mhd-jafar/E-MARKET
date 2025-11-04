@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
 use App\Http\Helpers\ApiResponse;
+use App\Models\Order;
 use App\Models\Product;
 use GPBMetadata\Google\Protobuf\Api;
 use Illuminate\Http\Request;
@@ -13,13 +14,8 @@ use Stripe\Stripe;
 class StripeController extends Controller
 {
 
-    public function checkout(Request $request)
+    public function checkout(array $products, int $orderId)
     {
-        $products = $request->input('products', []);
-        if (empty($products)) {
-            return response()->json(['error' => 'No products provided'], 400);
-        }
-
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $lineItems = [];
@@ -30,7 +26,8 @@ class StripeController extends Controller
                     'product_data' => [
                         'name' => $product['name'],
                     ],
-                    'unit_amount' => $product['price'],
+                    // Stripe expects the amount in cents
+                    'unit_amount' => (int) ($product['price'] * 100),
                 ],
                 'quantity' => $product['quantity'],
             ];
@@ -42,15 +39,37 @@ class StripeController extends Controller
             'mode' => 'payment',
             'success_url' => url('/success'),
             'cancel_url' => url('/cancel'),
+            'metadata' => [
+                'order_id' => $orderId,
+            ]
         ]);
 
-        return response()->json(['url' => $session->url]);
+        return $session->url;
     }
 
-    public function index()
+    public function handleWebhook(Request $request)
     {
-        $products = Product::all();
-        return ApiResponse::successWithData(ProductResource::collection($products), 200);
+        $payload = $request->getContent();
+        $sig = $request->header('Stripe-Signature');
+
+        try {
+            $event = \Stripe\Webhook::constructEvent(
+                $payload,
+                $sig,
+                env('STRIPE_WEBHOOK_SECRET')
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error('Invalid signature', 400);
+        }
+
+        if ($event->type == 'checkout.session.completed') {
+            $session = $event->data->object;
+            $orderId = $session->metadata->order_id;
+
+            Order::where('id', $orderId)->update(['status' => 'paid']);
+        }
+
+        return ApiResponse::success('Webhook handled successfully');
     }
 }
 

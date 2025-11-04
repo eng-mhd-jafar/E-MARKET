@@ -75,5 +75,4 @@ class AuthController extends Controller
         ], 'Login with Google successful.');
     }
 
-
 }

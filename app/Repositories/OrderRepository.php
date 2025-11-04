@@ -1,17 +1,20 @@
 <?php
 
 namespace App\Repositories;
+use App\Http\Controllers\StripeController;
 use App\Models\Order;
 ;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Stripe\Stripe;
 
 class OrderRepository
 {
 
-    public function store($orderData, $total_Price): bool
+    public function store($orderData, $total_Price)
     {
+
         try {
             DB::beginTransaction();
 
@@ -24,16 +27,18 @@ class OrderRepository
                 'total_price' => $total_Price,
             ]);
 
-            foreach ($orderData["order_items"] as $item) {
+            foreach ($orderData["items"] as $item) {
                 $order->items()->create($item);
             }
+            $stripe = new StripeController();
+            $url = $stripe->checkout($orderData['items'], $order->id);
 
             DB::commit();
-            return true;
+
+            return $url;
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Order creation failed: ' . $e->getMessage());
             return false;
         }
     }

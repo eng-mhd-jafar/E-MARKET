@@ -23,3 +23,5 @@ Route::post('/stripe/checkout', [StripeController::class, 'checkout']);
 
 Route::get('/products', [StripeController::class, 'index']);
 Route::post('/CreateOreder', [OrderController::class, 'store'])->middleware('auth:sanctum');
+
+Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook']);
