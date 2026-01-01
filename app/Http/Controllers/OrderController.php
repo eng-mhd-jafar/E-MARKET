@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateOrderRequest;
 use App\Http\Helpers\ApiResponse;
+use App\Models\Product;
 use App\Services\OrderService;
 
 
@@ -25,5 +26,10 @@ class OrderController extends Controller
         } else {
             return ApiResponse::error('Failed to place order');
         }
+    }
+
+    public function index()
+    {
+        return Product::all();
     }
 }

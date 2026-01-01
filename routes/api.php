@@ -21,7 +21,7 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::post('/stripe/checkout', [StripeController::class, 'checkout']);
 
-Route::get('/products', [StripeController::class, 'index']);
+Route::get('/products', [OrderController::class, 'index'])->middleware('throttle:Products');
 Route::post('/CreateOreder', [OrderController::class, 'store'])->middleware('auth:sanctum');
 
 Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook']);
