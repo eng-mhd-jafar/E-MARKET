@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\JwtAuthController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StripeController;
@@ -9,6 +10,20 @@ use Illuminate\Support\Facades\Route;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+// JWT Authentication Routes
+Route::prefix('jwt')->group(function () {
+    Route::post('register', [JwtAuthController::class, 'register']);
+    Route::post('login', [JwtAuthController::class, 'login']);
+    
+    Route::middleware('auth:jwt')->group(function () {
+        Route::get('me', [JwtAuthController::class, 'me']);
+        Route::post('logout', [JwtAuthController::class, 'logout']);
+        Route::post('refresh', [JwtAuthController::class, 'refresh']);
+    });
+});
+
+
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('/register', 'register');

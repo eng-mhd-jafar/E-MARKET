@@ -16,6 +16,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
+        "php-open-source-saver/jwt-auth": "^2.8",
         "stripe/stripe-php": "^17.6"
     },
     "require-dev": {
