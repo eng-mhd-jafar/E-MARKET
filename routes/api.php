@@ -24,15 +24,15 @@ Route::prefix('jwt')->group(function () {
 });
 
 
-
-Route::controller(AuthController::class)->group(function () {
-    Route::post('/register', 'register');
-    Route::post('/check-code', 'CheckCode');
-    Route::post('/login', 'login');
-    Route::post('/logout', 'logout')->middleware('auth:sanctum');
-    Route::get('auth/google', 'redirectToGoogle');
-    Route::get('auth/google/callback', 'handleGoogleCallback');
-});
+// Sanctum Authentication Routes
+// Route::controller(AuthController::class)->group(function () {
+//     Route::post('/register', 'register');
+//     Route::post('/check-code', 'CheckCode');
+//     Route::post('/login', 'login');
+//     Route::post('/logout', 'logout')->middleware('auth:sanctum');
+//     Route::get('auth/google', 'redirectToGoogle');
+//     Route::get('auth/google/callback', 'handleGoogleCallback');
+// });
 
 Route::post('/stripe/checkout', [StripeController::class, 'checkout']);
 

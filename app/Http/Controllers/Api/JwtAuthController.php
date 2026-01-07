@@ -3,112 +3,88 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-
+use App\Http\Requests\JwtRegisterRequest;
+use App\Http\Requests\JwtLoginRequest;
+use App\Http\Resources\UserResource;
+use App\Http\Helpers\ApiResponse;
+use App\Services\JwtAuthService;
 
 class JwtAuthController extends Controller
 {
-    public function __construct()
+    public function __construct(protected JwtAuthService $jwtAuthService)
     {
-        $this->middleware('auth:jwt', ['except' => ['login', 'register']]);
     }
 
-    public function register(Request $request)
+    public function register(JwtRegisterRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+        $result = $this->jwtAuthService->register($request->validated());
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        $responseData = [
+            'access_token' => $result['access_token'],
+            'refresh_token' => $result['refresh_token'],
+            'token_type' => $result['token_type'],
+            'expires_in' => $result['expires_in'],
+            'refresh_expires_in' => $result['refresh_expires_in'],
+            'user' => new UserResource($result['user'])
+        ];
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-        
-        $token = auth('jwt')->login($user);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'User registered successfully',
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('jwt')->factory()->getTTL() * 60
-        ], 201);
+        return ApiResponse::successWithData($responseData, 'User registered successfully', 201);
     }
 
-        public function login(Request $request)
+    public function login(JwtLoginRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+        $result = $this->jwtAuthService->login($request->only('email', 'password'));
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+        if (!$result) {
+            return ApiResponse::unauthorized('Invalid credentials');
         }
 
-        $credentials = $request->only('email', 'password');
+        $responseData = [
+            'access_token' => $result['access_token'],
+            'refresh_token' => $result['refresh_token'],
+            'token_type' => $result['token_type'],
+            'expires_in' => $result['expires_in'],
+            'refresh_expires_in' => $result['refresh_expires_in'],
+            'user' => new UserResource($result['user'])
+        ];
 
-        if (!$token = auth('jwt')->attempt($credentials)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid credentials'
-            ], 401);
-        }
-
-        return $this->respondWithToken($token);
+        return ApiResponse::successWithData($responseData, 'Login successfully');
     }
 
     public function me()
     {
-        return response()->json([
-            'success' => true,
-            'user' => auth('jwt')->user()
-        ]);
+        $user = $this->jwtAuthService->getCurrentUser();
+
+        if (!$user) {
+            return ApiResponse::unauthorized('User not authenticated');
+        }
+
+        return ApiResponse::successWithData(['user' => new UserResource($user)], 'User data retrieved successfully');
     }
 
     public function logout()
     {
-        auth('jwt')->logout();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Successfully logged out'
-        ]);
+        $this->jwtAuthService->logout();
+        return ApiResponse::success('Successfully logged out');
     }
 
     public function refresh()
     {
-        return $this->respondWithToken(auth('jwt')->refresh());
-    }
+        try {
+            $result = $this->jwtAuthService->refreshToken();
 
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'success' => true,
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('jwt')->factory()->getTTL() * 60,
-            'user' => auth('jwt')->user()
-        ]);
+            $responseData = [
+                'access_token' => $result['access_token'],
+                'refresh_token' => $result['refresh_token'],
+                'token_type' => $result['token_type'],
+                'expires_in' => $result['expires_in'],
+                'refresh_expires_in' => $result['refresh_expires_in'],
+                'user' => new UserResource($result['user'])
+            ];
+
+            return ApiResponse::successWithData($responseData, 'Token refreshed successfully');
+        } catch (\Exception $e) {
+            return ApiResponse::unauthorized('Unable to refresh token');
+        }
     }
 }
-// Note: continue from step six on cloud.ai >>>
-
-
