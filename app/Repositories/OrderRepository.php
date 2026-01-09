@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Repositories;
-use App\Http\Controllers\StripeController;
+use App\Http\Controllers\Api\StripeController;
 use App\Models\Order;
 ;
 use Illuminate\Support\Facades\Auth;

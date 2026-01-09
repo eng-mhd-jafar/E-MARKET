@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\JwtAuthController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\StripeController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\StripeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +15,7 @@ Route::get('/user', function (Request $request) {
 Route::prefix('jwt')->group(function () {
     Route::post('register', [JwtAuthController::class, 'register']);
     Route::post('login', [JwtAuthController::class, 'login']);
-    
+
     Route::middleware('auth:jwt')->group(function () {
         Route::get('me', [JwtAuthController::class, 'me']);
         Route::post('logout', [JwtAuthController::class, 'logout']);
@@ -25,14 +25,14 @@ Route::prefix('jwt')->group(function () {
 
 
 // Sanctum Authentication Routes
-// Route::controller(AuthController::class)->group(function () {
-//     Route::post('/register', 'register');
-//     Route::post('/check-code', 'CheckCode');
-//     Route::post('/login', 'login');
-//     Route::post('/logout', 'logout')->middleware('auth:sanctum');
-//     Route::get('auth/google', 'redirectToGoogle');
-//     Route::get('auth/google/callback', 'handleGoogleCallback');
-// });
+Route::controller(AuthController::class)->group(function () {
+    Route::post('/register', 'register');
+    Route::post('/check-code', 'CheckCode');
+    Route::post('/login', 'login');
+    Route::post('/logout', 'logout')->middleware('auth:sanctum');
+    Route::get('auth/google', 'redirectToGoogle');
+    Route::get('auth/google/callback', 'handleGoogleCallback');
+});
 
 Route::post('/stripe/checkout', [StripeController::class, 'checkout']);
 

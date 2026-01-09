@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
-use Laravel\Socialite\Facades\Socialite;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use Laravel\Socialite\Facades\Socialite;
 use App\Http\Requests\UserCheckCodeRequest;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
