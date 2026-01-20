@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\JwtAuthController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\StripeController;
+use GPBMetadata\Google\Api\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,7 @@ Route::prefix('jwt')->group(function () {
         Route::get('me', [JwtAuthController::class, 'me']);
         Route::post('logout', [JwtAuthController::class, 'logout']);
         Route::post('refresh', [JwtAuthController::class, 'refresh']);
+        Route::get('AllUsers', [AuthController::class, 'index']);
     });
 });
 
@@ -37,6 +39,6 @@ Route::controller(AuthController::class)->group(function () {
 Route::post('/stripe/checkout', [StripeController::class, 'checkout']);
 
 Route::get('/products', [OrderController::class, 'index'])->middleware('throttle:Products');
-Route::post('/CreateOreder', [OrderController::class, 'store'])->middleware('auth:sanctum');
+Route::post('/CreateOrder', [OrderController::class, 'store'])->middleware('auth:sanctum,jwt');
 
 Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook']);

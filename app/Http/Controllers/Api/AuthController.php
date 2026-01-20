@@ -9,6 +9,7 @@ use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Helpers\ApiResponse;
+use App\Models\User;
 use App\Services\AuthService;
 use Illuminate\Support\Facades\Auth;
 
@@ -74,6 +75,12 @@ class AuthController extends Controller
             'token' => $result['token'],
             'user' => new UserResource($result['user'])
         ], 'Login with Google successful.');
+    }
+
+    public function index()
+    {
+        $UserWithDate = User::with("orders")->get();
+        return ApiResponse::successWithData($UserWithDate, 'Users with orders retrieved successfully.');
     }
 
 }
