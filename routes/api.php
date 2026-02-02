@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\JwtAuthController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\StripeController;
-use GPBMetadata\Google\Api\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,9 +35,11 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('auth/google/callback', 'handleGoogleCallback');
 });
 
+// stripe payment routes
 Route::post('/stripe/checkout', [StripeController::class, 'checkout']);
+Route::post('/stripe/handleWebhook', [StripeController::class, 'handleWebhook']);
 
+// order routes
 Route::get('/products', [OrderController::class, 'index'])->middleware('throttle:Products');
-Route::post('/CreateOrder', [OrderController::class, 'store'])->middleware('auth:sanctum,jwt');
+Route::post('/placeOrder', [OrderController::class, 'store'])->middleware('auth:sanctum,jwt');
 
-Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook']);

@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Core\Domain\Interfaces\OrderRepositoryInterface;
+use App\Core\Domain\Interfaces\PaymentGatewayInterface;
+use App\Models\Order;
+use App\Repositories\OrderRepository;
+use App\Services\StripeService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
@@ -14,7 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(PaymentGatewayInterface::class, function ($app) {
+            return new StripeService(env('STRIPE_KEY'), $app->make(OrderRepositoryInterface::class));
+        });
+
+        $this->app->bind(OrderRepositoryInterface::class, function ($app) {
+            return new OrderRepository($app->make(Order::class));
+        });
     }
 
     /**

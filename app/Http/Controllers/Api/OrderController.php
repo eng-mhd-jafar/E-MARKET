@@ -12,8 +12,6 @@ use App\Services\OrderService;
 class OrderController extends Controller
 {
     protected $orderService;
-
-
     public function __construct(OrderService $orderService)
     {
         $this->orderService = $orderService;
@@ -21,9 +19,9 @@ class OrderController extends Controller
 
     public function store(CreateOrderRequest $request)
     {
-        $StripeUrl = $this->orderService->store($request->toArray());
-        if ($StripeUrl) {
-            return ApiResponse::successWithData($StripeUrl, 'Order placed successfully');
+        $stripeUrl = $this->orderService->store(($request->validated())->toArray());
+        if ($stripeUrl) {
+            return ApiResponse::successWithData($stripeUrl, 'Order placed successfully');
         } else {
             return ApiResponse::error('Failed to place order');
         }

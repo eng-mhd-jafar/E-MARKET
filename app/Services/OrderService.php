@@ -2,22 +2,21 @@
 
 namespace App\Services;
 
-use App\Models\Order;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\CreateOrderRequest;
-use App\Repositories\OrderRepository;
+use App\Core\Domain\Interfaces\OrderRepositoryInterface;
+use App\Core\Domain\Interfaces\PaymentGatewayInterface;
 
 class OrderService
 {
-    protected $OrderRepository;
+    protected $orderRepositoryInterface;
+    protected $paymentGatewayInterface;
 
-
-    public function __construct(OrderRepository $OrderRepository)
+    public function __construct(OrderRepositoryInterface $orderRepositoryInterface, PaymentGatewayInterface $paymentGatewayInterface)
     {
-        $this->OrderRepository = $OrderRepository;
+        $this->orderRepositoryInterface = $orderRepositoryInterface;
+        $this->paymentGatewayInterface = $paymentGatewayInterface;
     }
 
-    public function Store(array $OrderData)
+    public function store(array $OrderData)
     {
         $total_price = 0;
 
@@ -25,6 +24,11 @@ class OrderService
             $total_price += $item['price'] * $item['quantity'];
         }
 
-        return $this->OrderRepository->store($OrderData, $total_price);
+        $order = $this->orderRepositoryInterface->store($OrderData, $total_price);
+        if (!$order) {
+            return false;
+        }
+        $url = $this->paymentGatewayInterface->checkout($OrderData['items'], $order->id);
+        return $url;
     }
 }

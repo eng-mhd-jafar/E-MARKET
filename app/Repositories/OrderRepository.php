@@ -1,16 +1,19 @@
 <?php
 
 namespace App\Repositories;
-use App\Http\Controllers\Api\StripeController;
+
+use App\Core\Domain\Interfaces\OrderRepositoryInterface;
 use App\Models\Order;
-;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Stripe\Stripe;
 
-class OrderRepository
+class OrderRepository implements OrderRepositoryInterface
 {
+    protected $model;
+    public function __construct(Order $model)
+    {
+        $this->model = $model;
+    }
 
     public function store($orderData, $total_Price)
     {
@@ -18,7 +21,7 @@ class OrderRepository
         try {
             DB::beginTransaction();
 
-            $order = Order::create([
+            $order = $this->model->create([
                 'user_id' => Auth::id(),
                 'phone_number' => $orderData['phone_number'],
                 'location' => $orderData['location'] ?? null,
@@ -30,16 +33,23 @@ class OrderRepository
             foreach ($orderData["items"] as $item) {
                 $order->items()->create($item);
             }
-            $stripe = new StripeController();
-            $url = $stripe->checkout($orderData['items'], $order->id);
 
             DB::commit();
-
-            return $url;
+            return $order;
 
         } catch (\Exception $e) {
             DB::rollBack();
             return false;
+        }
+    }
+
+
+    public function update($order_id)
+    {
+        try {
+            $this->model->where('id', $order_id)->update(['status' => 'paid']);
+        } catch (\Exception $e) {
+            return $e->getMessage();
         }
     }
 }
