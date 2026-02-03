@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\JwtRegisterRequest;
 use App\Http\Requests\JwtLoginRequest;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\SanctumResource;
 use App\Http\Helpers\ApiResponse;
 use App\Services\JwtAuthService;
 
@@ -25,7 +25,7 @@ class JwtAuthController extends Controller
             'token_type' => $result['token_type'],
             'expires_in' => $result['expires_in'],
             'refresh_expires_in' => $result['refresh_expires_in'],
-            'user' => new UserResource($result['user'])
+            'user' => new SanctumResource($result['user'])
         ];
 
         return ApiResponse::successWithData($responseData, 'User registered successfully', 201);
@@ -45,7 +45,7 @@ class JwtAuthController extends Controller
             'token_type' => $result['token_type'],
             'expires_in' => $result['expires_in'],
             'refresh_expires_in' => $result['refresh_expires_in'],
-            'user' => new UserResource($result['user'])
+            'user' => new SanctumResource($result['user'])
         ];
 
         return ApiResponse::successWithData($responseData, 'Login successfully');
@@ -59,7 +59,7 @@ class JwtAuthController extends Controller
             return ApiResponse::unauthorized('User not authenticated');
         }
 
-        return ApiResponse::successWithData(['user' => new UserResource($user)], 'User data retrieved successfully');
+        return ApiResponse::successWithData(['user' => new SanctumResource($user)], 'User data retrieved successfully');
     }
 
     public function logout()
@@ -79,7 +79,7 @@ class JwtAuthController extends Controller
                 'token_type' => $result['token_type'],
                 'expires_in' => $result['expires_in'],
                 'refresh_expires_in' => $result['refresh_expires_in'],
-                'user' => new UserResource($result['user'])
+                'user' => new SanctumResource($result['user'])
             ];
 
             return ApiResponse::successWithData($responseData, 'Token refreshed successfully');

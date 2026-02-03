@@ -7,19 +7,23 @@ use Illuminate\Support\Facades\Hash;
 
 class JwtAuthRepository
 {
+    public function __construct(protected User $user)
+    {
+    }
+
     public function create(array $data): User
     {
         $data['password'] = Hash::make($data['password']);
-        return User::create($data);
+        return $this->user->create($data);
     }
 
     public function findByEmail(string $email): ?User
     {
-        return User::where('email', $email)->first();
+        return $this->user->where('email', $email)->first();
     }
 
     public function findById(int $id): ?User
     {
-        return User::find($id);
+        return $this->user->find($id);
     }
 }

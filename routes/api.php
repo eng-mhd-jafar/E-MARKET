@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\JwtAuthController;
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\SanctumController;
 use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\StripeController;
+use App\Http\Controllers\Api\PaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,13 +20,13 @@ Route::prefix('jwt')->group(function () {
         Route::get('me', [JwtAuthController::class, 'me']);
         Route::post('logout', [JwtAuthController::class, 'logout']);
         Route::post('refresh', [JwtAuthController::class, 'refresh']);
-        Route::get('AllUsers', [AuthController::class, 'index']);
+        Route::get('AllUsers', [SanctumController::class, 'index']);
     });
 });
 
 
 // Sanctum Authentication Routes
-Route::controller(AuthController::class)->group(function () {
+Route::controller(SanctumController::class)->group(function () {
     Route::post('/register', 'register');
     Route::post('/check-code', 'CheckCode');
     Route::post('/login', 'login');
@@ -35,9 +35,9 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('auth/google/callback', 'handleGoogleCallback');
 });
 
-// stripe payment routes
-Route::post('/stripe/checkout', [StripeController::class, 'checkout']);
-Route::post('/stripe/handleWebhook', [StripeController::class, 'handleWebhook']);
+// payment routes
+Route::post('/stripe/checkout', [PaymentController::class, 'checkout']);
+Route::post('/stripe/handleWebhook', [PaymentController::class, 'handleWebhook']);
 
 // order routes
 Route::get('/products', [OrderController::class, 'index'])->middleware('throttle:Products');

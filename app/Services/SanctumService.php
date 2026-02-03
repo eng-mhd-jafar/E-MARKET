@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 
 
-class AuthService
+class SanctumService
 {
     protected $userRepository;
     public function __construct(UserRepository $userRepository)

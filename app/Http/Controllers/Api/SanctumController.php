@@ -7,15 +7,15 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Http\Requests\UserCheckCodeRequest;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\SanctumResource;
 use App\Http\Helpers\ApiResponse;
 use App\Models\User;
-use App\Services\AuthService;
+use App\Services\SanctumService;
 use Illuminate\Support\Facades\Auth;
 
-class AuthController extends Controller
+class SanctumController extends Controller
 {
-    public function __construct(protected AuthService $authService)
+    public function __construct(protected SanctumService $authService)
     {
     }
 
@@ -45,9 +45,9 @@ class AuthController extends Controller
             return ApiResponse::error('The email is not confirmed', 401);
         }
         if (isset($result['error']) && $result['error'] === 'wrong_password') {
-            return ApiResponse::error('The email is not confirmed', 401);
+            return ApiResponse::error('The email or password is incorrect', 401);
         }
-        return ApiResponse::successWithData(['token' => $result['token'], 'user' => new UserResource($result['user'])], 'Login successfully.', 200);
+        return ApiResponse::successWithData(['token' => $result['token'], 'user' => new SanctumResource($result['user'])], 'Login successfully.', 200);
     }
 
     public function logout()
@@ -73,7 +73,7 @@ class AuthController extends Controller
 
         return ApiResponse::successWithData([
             'token' => $result['token'],
-            'user' => new UserResource($result['user'])
+            'user' => new SanctumResource($result['user'])
         ], 'Login with Google successful.');
     }
 

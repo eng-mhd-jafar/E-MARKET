@@ -5,17 +5,21 @@ use App\Models\User;
 
 class UserRepository
 {
+    public function __construct(protected User $user)
+    {
+    }
+
     public function create(array $data): User
     {
-        return User::create($data);
+        return $this->user->create($data);
     }
 
     public function findByEmail(string $email): ?User
     {
-        return User::where('email', $email)->first();
+        return $this->user->where('email', $email)->first();
     }
 
-    public function markEmailAsVerified($user)
+    public function markEmailAsVerified(User $user): void
     {
         $user->update([
             'email_verified_at' => now(),

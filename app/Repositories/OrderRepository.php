@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-    protected $model;
-    public function __construct(Order $model)
+    protected Order $order;
+
+    public function __construct(Order $order)
     {
-        $this->model = $model;
+        $this->order = $order;
     }
 
     public function store($orderData, $total_Price)
@@ -21,7 +22,7 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             DB::beginTransaction();
 
-            $order = $this->model->create([
+            $order = $this->order->create([
                 'user_id' => Auth::id(),
                 'phone_number' => $orderData['phone_number'],
                 'location' => $orderData['location'] ?? null,
@@ -47,7 +48,7 @@ class OrderRepository implements OrderRepositoryInterface
     public function update($order_id)
     {
         try {
-            $this->model->where('id', $order_id)->update(['status' => 'paid']);
+            $this->order->where('id', $order_id)->update(['status' => 'paid']);
         } catch (\Exception $e) {
             return $e->getMessage();
         }

@@ -26,9 +26,4 @@ class OrderController extends Controller
             return ApiResponse::error('Failed to place order');
         }
     }
-
-    public function index()
-    {
-        return Product::all();
-    }
 }

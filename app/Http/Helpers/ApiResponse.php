@@ -32,8 +32,8 @@ class ApiResponse
         $response = [
             'success' => true,
             'data' => $data
-            
-            
+
+
         ];
 
         if ($message) {
@@ -50,7 +50,7 @@ class ApiResponse
      * @param int $statusCode رمز الحالة
      * @return \Illuminate\Http\JsonResponse
      */
-    
+
     public static function error($message = 'حدث خطأ أثناء تنفيذ العملية', $statusCode = 400)
     {
         return response()->json([

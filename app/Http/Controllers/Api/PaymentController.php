@@ -6,25 +6,26 @@ use App\Core\Domain\Interfaces\PaymentGatewayInterface;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class StripeController extends Controller
+class PaymentController extends Controller
 {
-    private $paymentGateway;
-
-    public function __construct(PaymentGatewayInterface $paymentGateway)
+    public function __construct(private PaymentGatewayInterface $paymentGateway)
     {
-        $this->paymentGateway = $paymentGateway;
     }
 
-    public function checkout(array $products, int $orderId)
+    public function checkout(Request $request)
     {
+        $products = $request->input('items', []);
+        $orderId = (int) $request->input('order_id');
+
         return $this->paymentGateway->checkOut($products, $orderId);
     }
 
     public function handleWebhook(Request $request)
     {
-        $sig = $request->header('Stripe-Signature');
         $payload = $request->getContent();
+        $sig = $request->header('Stripe-Signature', '');
+
         return $this->paymentGateway->handleWebhook($payload, $sig);
     }
-
 }
+
