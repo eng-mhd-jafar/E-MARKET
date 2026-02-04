@@ -11,9 +11,7 @@ use App\Services\JwtAuthService;
 
 class JwtAuthController extends Controller
 {
-    public function __construct(protected JwtAuthService $jwtAuthService)
-    {
-    }
+    public function __construct(protected JwtAuthService $jwtAuthService){}
 
     public function register(JwtRegisterRequest $request)
     {
@@ -27,7 +25,6 @@ class JwtAuthController extends Controller
             'refresh_expires_in' => $result['refresh_expires_in'],
             'user' => new SanctumResource($result['user'])
         ];
-
         return ApiResponse::successWithData($responseData, 'User registered successfully', 201);
     }
 
@@ -47,7 +44,6 @@ class JwtAuthController extends Controller
             'refresh_expires_in' => $result['refresh_expires_in'],
             'user' => new SanctumResource($result['user'])
         ];
-
         return ApiResponse::successWithData($responseData, 'Login successfully');
     }
 
@@ -58,7 +54,6 @@ class JwtAuthController extends Controller
         if (!$user) {
             return ApiResponse::unauthorized('User not authenticated');
         }
-
         return ApiResponse::successWithData(['user' => new SanctumResource($user)], 'User data retrieved successfully');
     }
 
@@ -81,8 +76,8 @@ class JwtAuthController extends Controller
                 'refresh_expires_in' => $result['refresh_expires_in'],
                 'user' => new SanctumResource($result['user'])
             ];
-
             return ApiResponse::successWithData($responseData, 'Token refreshed successfully');
+
         } catch (\Exception $e) {
             return ApiResponse::unauthorized('Unable to refresh token');
         }

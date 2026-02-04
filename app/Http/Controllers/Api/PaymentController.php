@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-    public function __construct(private PaymentGatewayInterface $paymentGateway)
-    {
-    }
+    public function __construct(protected PaymentGatewayInterface $paymentGateway){}
 
     public function checkout(Request $request)
     {

@@ -7,14 +7,7 @@ use App\Core\Domain\Interfaces\PaymentGatewayInterface;
 
 class OrderService
 {
-    protected $orderRepositoryInterface;
-    protected $paymentGatewayInterface;
-
-    public function __construct(OrderRepositoryInterface $orderRepositoryInterface, PaymentGatewayInterface $paymentGatewayInterface)
-    {
-        $this->orderRepositoryInterface = $orderRepositoryInterface;
-        $this->paymentGatewayInterface = $paymentGatewayInterface;
-    }
+    public function __construct(protected OrderRepositoryInterface $orderRepositoryInterface, protected PaymentGatewayInterface $paymentGatewayInterface){}
 
     public function store(array $OrderData)
     {

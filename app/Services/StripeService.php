@@ -10,13 +10,8 @@ use Stripe\Checkout\Session;
 
 class StripeService implements PaymentGatewayInterface
 {
-    protected string $apikey;
-    protected OrderRepositoryInterface $orderRepositoryInterface;
-
-    public function __construct(string $apikey, OrderRepositoryInterface $orderRepositoryInterface)
+    public function __construct(protected string $apikey, protected OrderRepositoryInterface $orderRepositoryInterface)
     {
-        $this->apikey = $apikey;
-        $this->orderRepositoryInterface = $orderRepositoryInterface;
         Stripe::setApiKey($this->apikey);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Core\Domain\JwtAuthRepositoryInterface;
 use App\Repositories\JwtAuthRepository;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -9,12 +10,10 @@ use Illuminate\Support\Facades\Auth;
 
 class JwtAuthService
 {
-    protected $jwtAuthRepository;
 
-    public function __construct(JwtAuthRepository $jwtAuthRepository)
-    {
-        $this->jwtAuthRepository = $jwtAuthRepository;
-    }
+
+    public function __construct(protected JwtAuthRepositoryInterface $jwtAuthRepository){}
+
 
     public function register(array $data): array
     {

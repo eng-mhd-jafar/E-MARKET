@@ -9,16 +9,13 @@ use Illuminate\Support\Facades\DB;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-    protected Order $order;
 
-    public function __construct(Order $order)
+    public function __construct(protected Order $order)
     {
-        $this->order = $order;
     }
 
     public function store($orderData, $total_Price)
     {
-
         try {
             DB::beginTransaction();
 

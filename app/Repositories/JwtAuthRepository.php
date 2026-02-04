@@ -2,14 +2,15 @@
 
 namespace App\Repositories;
 
+use App\Core\Domain\JwtAuthRepositoryInterface;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-class JwtAuthRepository
+class JwtAuthRepository implements JwtAuthRepositoryInterface
+
 {
-    public function __construct(protected User $user)
-    {
-    }
+    public function __construct(protected User $user){}
+
 
     public function create(array $data): User
     {
@@ -17,12 +18,12 @@ class JwtAuthRepository
         return $this->user->create($data);
     }
 
-    public function findByEmail(string $email): ?User
+    public function findUserByEmail(string $email): ?User
     {
         return $this->user->where('email', $email)->first();
     }
 
-    public function findById(int $id): ?User
+    public function findUserById(int $id): ?User
     {
         return $this->user->find($id);
     }

@@ -15,19 +15,20 @@ use Illuminate\Support\Facades\Auth;
 
 class SanctumController extends Controller
 {
-    public function __construct(protected SanctumService $authService)
-    {
-    }
+    public function __construct(protected SanctumService $sanctumService){}
 
     public function register(UserRegisterRequest $request)
     {
-        $user = $this->authService->register($request->validated());
+        $user = $this->sanctumService->register($request->validated());
+        if (!$user) {
+            return ApiResponse::error('Registration failed. Please try again.');
+        }
         return ApiResponse::success('The verification code has been sent to your email. Please check your email.');
     }
 
     public function CheckCode(UserCheckCodeRequest $request)
     {
-        $token = $this->authService->checkCode($request->validated());
+        $token = $this->sanctumService->checkCode($request->validated());
 
         if ($token) {
             return ApiResponse::successWithData($token, 'Email verified successfully.');
@@ -37,7 +38,7 @@ class SanctumController extends Controller
 
     public function login(UserLoginRequest $request)
     {
-        $result = $this->authService->login($request->validated());
+        $result = $this->sanctumService->login($request->validated());
         if (!$result) {
             return ApiResponse::error(['message' => 'user not found'], 404);
         }
@@ -52,7 +53,7 @@ class SanctumController extends Controller
 
     public function logout()
     {
-        $this->authService->logout(Auth::user());
+        $this->sanctumService->logout(Auth::user());
         return ApiResponse::success('Logout successfully.');
     }
 
@@ -65,7 +66,7 @@ class SanctumController extends Controller
     public function handleGoogleCallback()
     {
         $googleUser = Socialite::driver('google')->stateless()->user();
-        $result = $this->authService->loginWithGoogle($googleUser);
+        $result = $this->sanctumService->loginWithGoogle($googleUser);
 
         if (!$result) {
             return ApiResponse::error(['message' => 'Unable to authenticate with Google'], 401);

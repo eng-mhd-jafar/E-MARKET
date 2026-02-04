@@ -4,8 +4,13 @@ namespace App\Providers;
 
 use App\Core\Domain\Interfaces\OrderRepositoryInterface;
 use App\Core\Domain\Interfaces\PaymentGatewayInterface;
+use App\Core\Domain\Interfaces\SanctumRepositoryInterface;
+use App\Core\Domain\JwtAuthRepositoryInterface;
 use App\Models\Order;
+use App\Models\User;
+use App\Repositories\JwtAuthRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\SanctumRepository;
 use App\Services\StripeService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
@@ -26,6 +31,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(OrderRepositoryInterface::class, function ($app) {
             return new OrderRepository($app->make(Order::class));
         });
+
+        $this->app->bind(SanctumRepositoryInterface::class, function ($app) {
+            return new SanctumRepository($app->make(User::class));
+        });
+
+        $this->app->bind(JwtAuthRepositoryInterface::class, function ($app) {
+            return new JwtAuthRepository($app->make(User::class));
+        });
+
     }
 
     /**
