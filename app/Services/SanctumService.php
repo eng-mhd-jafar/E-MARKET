@@ -2,7 +2,9 @@
 namespace App\Services;
 
 use App\Core\Domain\Interfaces\SanctumRepositoryInterface;
-use App\Repositories\UserRepository;
+use App\Exceptions\EmailNotVerifiedException;
+use App\Exceptions\InvalidCredentialsException;
+use App\Exceptions\UserNotFoundException;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerificationCodeEmail;
 use App\Models\User;
@@ -13,8 +15,10 @@ use Laravel\Socialite\Contracts\User as SocialiteUser;
 
 class SanctumService
 {
-    public function __construct(protected SanctumRepositoryInterface $sanctumRepository){}
-    
+    public function __construct(protected SanctumRepositoryInterface $sanctumRepository)
+    {
+    }
+
     public function register(array $data)
     {
         try {
@@ -26,7 +30,7 @@ class SanctumService
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            return null;
+            return throw new \Exception('Registration failed. Please try again.');
         }
         return $user;
     }
@@ -49,21 +53,12 @@ class SanctumService
     public function login(array $data)
     {
         $user = $this->sanctumRepository->findUserByEmail($data['email']);
-        if (!$user)
-            return null;
-
-        if (is_null($user->email_verified_at))
-            return ['error' => 'email_not_verified'];
-        
-        if (!Hash::check($data['password'], $user->password))
-            return ['error' => 'wrong_password'];
-
-        $token = $this->GenerateToken($user);
         return [
-            'token' => $token,
+            'token' => $this->GenerateToken($user),
             'user' => $user
         ];
     }
+
     public function logout($user)
     {
         $this->sanctumRepository->deleteUserTokens($user);
@@ -81,7 +76,6 @@ class SanctumService
                 'password' => str()->random(16),
             ]);
         }
-
         $token = $this->GenerateToken($user);
 
         return [

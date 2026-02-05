@@ -15,14 +15,13 @@ use Illuminate\Support\Facades\Auth;
 
 class SanctumController extends Controller
 {
-    public function __construct(protected SanctumService $sanctumService){}
+    public function __construct(protected SanctumService $sanctumService)
+    {
+    }
 
     public function register(UserRegisterRequest $request)
     {
         $user = $this->sanctumService->register($request->validated());
-        if (!$user) {
-            return ApiResponse::error('Registration failed. Please try again.');
-        }
         return ApiResponse::success('The verification code has been sent to your email. Please check your email.');
     }
 
@@ -39,16 +38,16 @@ class SanctumController extends Controller
     public function login(UserLoginRequest $request)
     {
         $result = $this->sanctumService->login($request->validated());
-        if (!$result) {
-            return ApiResponse::error(['message' => 'user not found'], 404);
-        }
-        if (isset($result['error']) && $result['error'] === 'email_not_verified') {
-            return ApiResponse::error('The email is not confirmed', 401);
-        }
-        if (isset($result['error']) && $result['error'] === 'wrong_password') {
-            return ApiResponse::error('The email or password is incorrect', 401);
-        }
-        return ApiResponse::successWithData(['token' => $result['token'], 'user' => new SanctumResource($result['user'])], 'Login successfully.', 200);
+
+        return ApiResponse::successWithData(
+            [
+                'token' => $result['token'],
+                'user' => new SanctumResource($result['user'])
+            ]
+            ,
+            'Login successfully.',
+            200
+        );
     }
 
     public function logout()
