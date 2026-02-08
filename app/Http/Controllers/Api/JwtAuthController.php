@@ -11,7 +11,9 @@ use App\Services\JwtAuthService;
 
 class JwtAuthController extends Controller
 {
-    public function __construct(protected JwtAuthService $jwtAuthService){}
+    public function __construct(protected JwtAuthService $jwtAuthService)
+    {
+    }
 
     public function register(JwtRegisterRequest $request)
     {

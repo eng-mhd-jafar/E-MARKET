@@ -10,11 +10,9 @@ use Illuminate\Support\Facades\Auth;
 
 class JwtAuthService
 {
-
-
-    public function __construct(protected JwtAuthRepositoryInterface $jwtAuthRepository){}
-
-
+    public function __construct(protected JwtAuthRepositoryInterface $jwtAuthRepository)
+    {
+    }
     public function register(array $data): array
     {
         $user = $this->jwtAuthRepository->create($data);

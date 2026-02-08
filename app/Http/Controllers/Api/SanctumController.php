@@ -18,7 +18,6 @@ class SanctumController extends Controller
     public function __construct(protected SanctumService $sanctumService)
     {
     }
-
     public function register(UserRegisterRequest $request)
     {
         $user = $this->sanctumService->register($request->validated());
@@ -28,23 +27,17 @@ class SanctumController extends Controller
     public function CheckCode(UserCheckCodeRequest $request)
     {
         $token = $this->sanctumService->checkCode($request->validated());
-
-        if ($token) {
-            return ApiResponse::successWithData($token, 'Email verified successfully.');
-        }
-        return ApiResponse::error('Email verification failed.');
+        return ApiResponse::successWithData($token, 'Email verified successfully.');
     }
 
     public function login(UserLoginRequest $request)
     {
         $result = $this->sanctumService->login($request->validated());
-
         return ApiResponse::successWithData(
             [
                 'token' => $result['token'],
                 'user' => new SanctumResource($result['user'])
-            ]
-            ,
+            ],
             'Login successfully.',
             200
         );
@@ -66,11 +59,6 @@ class SanctumController extends Controller
     {
         $googleUser = Socialite::driver('google')->stateless()->user();
         $result = $this->sanctumService->loginWithGoogle($googleUser);
-
-        if (!$result) {
-            return ApiResponse::error(['message' => 'Unable to authenticate with Google'], 401);
-        }
-
         return ApiResponse::successWithData([
             'token' => $result['token'],
             'user' => new SanctumResource($result['user'])

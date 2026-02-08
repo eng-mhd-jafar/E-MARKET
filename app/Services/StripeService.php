@@ -14,7 +14,6 @@ class StripeService implements PaymentGatewayInterface
     {
         Stripe::setApiKey($this->apikey);
     }
-
     public function checkOut(array $products, int $order_id)
     {
         $lineItems = [];

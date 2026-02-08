@@ -7,7 +7,7 @@ use Exception;
 
 class InvalidCredentialsException extends Exception
 {
-    public function render($request)
+    public function render()
     {
         return ApiResponse::error('invalid credentials provided', 401);
     }

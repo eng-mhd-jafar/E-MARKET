@@ -7,8 +7,9 @@ use App\Core\Domain\Interfaces\PaymentGatewayInterface;
 
 class OrderService
 {
-    public function __construct(protected OrderRepositoryInterface $orderRepositoryInterface, protected PaymentGatewayInterface $paymentGatewayInterface){}
-
+    public function __construct(protected OrderRepositoryInterface $orderRepositoryInterface, protected PaymentGatewayInterface $paymentGateway)
+    {
+    }
     public function store(array $OrderData)
     {
         $total_price = 0;
@@ -21,7 +22,7 @@ class OrderService
         if (!$order) {
             return false;
         }
-        $url = $this->paymentGatewayInterface->checkout($OrderData['items'], $order->id);
+        $url = $this->paymentGateway->checkout($OrderData['items'], $order->id);
         return $url;
     }
 }

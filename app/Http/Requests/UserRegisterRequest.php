@@ -27,8 +27,6 @@ class UserRegisterRequest extends FormRequest
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone_number' => ['required', 'string', 'max:255'],
         ];
-
-
     }
     public function messages()
     {
