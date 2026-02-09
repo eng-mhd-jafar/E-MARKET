@@ -13,15 +13,10 @@ class OrderService
     public function store(array $OrderData)
     {
         $total_price = 0;
-
         foreach ($OrderData['items'] as $item) {
             $total_price += $item['price'] * $item['quantity'];
         }
-
         $order = $this->orderRepositoryInterface->store($OrderData, $total_price);
-        if (!$order) {
-            return false;
-        }
         $url = $this->paymentGateway->checkout($OrderData['items'], $order->id);
         return $url;
     }

@@ -9,7 +9,6 @@ use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Resources\SanctumResource;
 use App\Http\Helpers\ApiResponse;
-use App\Models\User;
 use App\Services\SanctumService;
 use Illuminate\Support\Facades\Auth;
 
