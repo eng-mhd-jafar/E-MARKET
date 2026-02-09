@@ -28,7 +28,8 @@ Route::prefix('jwt')->group(function () {
 // Sanctum Authentication Routes
 Route::controller(SanctumController::class)->group(function () {
     Route::post('/register', 'register');
-    Route::post('/check-code', 'CheckCode');
+    Route::post('/check-OTP', 'checkOTP')->middleware('throttle:otp-limiter');
+    Route::post('/resend-OTP', 'reSendOTP')->middleware('throttle:otp-limiter');
     Route::post('/login', 'login');
     Route::post('/logout', 'logout')->middleware('auth:sanctum');
     Route::get('auth/google', 'redirectToGoogle');

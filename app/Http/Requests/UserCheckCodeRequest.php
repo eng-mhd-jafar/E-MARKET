@@ -22,7 +22,7 @@ class UserCheckCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => 'required|numeric|digits:4',
+            'OTP' => 'required|numeric|digits:4',
             'email' => 'required|email',
         ];
     }

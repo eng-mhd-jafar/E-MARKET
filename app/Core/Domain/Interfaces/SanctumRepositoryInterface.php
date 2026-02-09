@@ -10,9 +10,8 @@ interface SanctumRepositoryInterface
 
     public function findUserByEmail(string $email): ?User;
 
-    public function markEmailAsVerified(User $user): void;
-
     public function deleteUserTokens(User $user): bool;
 
+    public function update(User $user): void;
 
 }

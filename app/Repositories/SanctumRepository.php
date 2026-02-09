@@ -6,9 +6,9 @@ use App\Models\User;
 
 class SanctumRepository implements SanctumRepositoryInterface
 {
-    public function __construct(protected User $user){}
-
-
+    public function __construct(protected User $user)
+    {
+    }
     public function create(array $data): User
     {
         return $this->user->create($data);
@@ -19,18 +19,18 @@ class SanctumRepository implements SanctumRepositoryInterface
         return $this->user->where('email', $email)->first();
     }
 
-    public function markEmailAsVerified(User $user): void
-    {
-        $user->update([
-            'email_verified_at' => now(),
-            'OTP' => null,
-            'verification_code_expires_at' => null,
-        ]);
-    }
-
     public function deleteUserTokens(User $user): bool
     {
         return $user->tokens()->delete() > 0;
     }
 
+    public function incrementFailedAttempts(User $user): void
+    {
+        $user->increment('failed_attempts');
+    }
+
+    public function update(User $user): void
+    {
+        $user->save();
+    }
 }

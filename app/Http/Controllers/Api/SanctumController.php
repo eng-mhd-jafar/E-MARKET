@@ -24,9 +24,9 @@ class SanctumController extends Controller
         return ApiResponse::success('The verification code has been sent to your email. Please check your email.');
     }
 
-    public function CheckCode(UserCheckCodeRequest $request)
+    public function checkOTP(UserCheckCodeRequest $request)
     {
-        $token = $this->sanctumService->checkCode($request->validated());
+        $token = $this->sanctumService->checkOTP($request->validated());
         return ApiResponse::successWithData($token, 'Email verified successfully.');
     }
 
@@ -63,12 +63,6 @@ class SanctumController extends Controller
             'token' => $result['token'],
             'user' => new SanctumResource($result['user'])
         ], 'Login with Google successful.');
-    }
-
-    public function index()
-    {
-        $UserWithDate = User::with("orders")->get();
-        return ApiResponse::successWithData($UserWithDate, 'Users with orders retrieved successfully.');
     }
 
 }
