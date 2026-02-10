@@ -14,9 +14,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        RateLimiter::for('otp-limiter', function (Request $request) {
-            return Limit::perMinute(5)->by($request->ip());
-        });
+        //
     }
 
     /**
@@ -24,6 +22,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        RateLimiter::for('otp-limiter', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
+        });
     }
 }
