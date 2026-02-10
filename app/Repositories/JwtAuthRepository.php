@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Core\Domain\JwtAuthRepositoryInterface;
+use App\Core\Domain\Interfaces\JwtAuthRepositoryInterface;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 

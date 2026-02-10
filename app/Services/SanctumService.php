@@ -40,7 +40,7 @@ class SanctumService
         }
     }
 
-    public function checkOTP(array $data)
+    public function verifyOTP(array $data)
     {
         $user = $this->sanctumRepository->findUserByEmail($data['email']);
         if (!$user) {

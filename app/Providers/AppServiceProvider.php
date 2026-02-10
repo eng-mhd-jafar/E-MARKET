@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Core\Domain\Interfaces\OrderRepositoryInterface;
 use App\Core\Domain\Interfaces\PaymentGatewayInterface;
 use App\Core\Domain\Interfaces\SanctumRepositoryInterface;
-use App\Core\Domain\JwtAuthRepositoryInterface;
+use App\Core\Domain\Interfaces\JwtAuthRepositoryInterface;
 use App\Models\Order;
 use App\Models\User;
 use App\Repositories\JwtAuthRepository;
@@ -15,7 +15,8 @@ use App\Services\StripeService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\ServiceProvider; 
+
 
 class AppServiceProvider extends ServiceProvider
 {

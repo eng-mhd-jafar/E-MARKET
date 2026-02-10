@@ -2,11 +2,8 @@
 
 namespace App\Services;
 
-use App\Core\Domain\JwtAuthRepositoryInterface;
-use App\Repositories\JwtAuthRepository;
+use App\Core\Domain\Interfaces\JwtAuthRepositoryInterface;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 
 class JwtAuthService
 {

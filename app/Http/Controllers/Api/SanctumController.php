@@ -23,9 +23,9 @@ class SanctumController extends Controller
         return ApiResponse::success('The verification code has been sent to your email. Please check your email.');
     }
 
-    public function checkOTP(UserCheckCodeRequest $request)
+    public function verifyOTP(UserCheckCodeRequest $request)
     {
-        $token = $this->sanctumService->checkOTP($request->validated());
+        $token = $this->sanctumService->verifyOTP($request->validated());
         return ApiResponse::successWithData($token, 'Email verified successfully.');
     }
 

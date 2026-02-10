@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Domain;
+namespace App\Core\Domain\Interfaces;
 use App\Models\User;
 
 interface JwtAuthRepositoryInterface
