@@ -9,9 +9,9 @@ use App\Exceptions\InvalidOtpException;
 use App\Exceptions\RegistrationFailedException;
 use App\Exceptions\ResendOtpTooSoonException;
 use App\Exceptions\UserNotFoundException;
+use App\Jobs\SendOtpJob;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerificationCodeEmail;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Illuminate\Support\Facades\Log;
@@ -30,8 +30,8 @@ class SanctumService
             $data['verification_code_expires_at'] = now()->addMinutes(5);
             $data['last_otp_at'] = now();
             $user = $this->sanctumRepository->create($data);
-            Mail::to($user->email)->send(new VerificationCodeEmail($data['OTP']));
             DB::commit();
+            SendOtpJob::dispatch($user, $data['OTP']);
             return $user;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -43,11 +43,11 @@ class SanctumService
     public function verifyOTP(array $data)
     {
         $user = $this->sanctumRepository->findUserByEmail($data['email']);
-        if (!$user) {
-            throw new UserNotFoundException();
-        }
         if ($user->failed_attempts == 3) {
             throw new FailedAttemptsExceededException();
+        }
+        if (!$user) {
+            throw new UserNotFoundException();
         }
         if ($user->verification_code_expires_at && now()->greaterThan($user->verification_code_expires_at)) {
             throw new ExpiredOtpException();
@@ -73,22 +73,25 @@ class SanctumService
         if (!$user) {
             throw new UserNotFoundException();
         }
-        if ($user->last_otp_at && now()->diffInSeconds($user->last_otp_at) < 60) {
-            throw new ResendOtpTooSoonException();
+        if ($user->last_otp_at && now()->lt($user->last_otp_at->addSeconds(60))) {
+            $secondsLeft = now()->diffInSeconds($user->last_otp_at->addSeconds(60));
+            throw new ResendOtpTooSoonException($secondsLeft);
         }
-        $user['OTP'] = rand(1000, 9999);
-        $user['verification_code_expires_at'] = now()->addMinutes(5);
-        $user['last_otp_at'] = now();
-        $user['failed_attempts'] = 0;
-        $this->sanctumRepository->update($user);
-        Mail::to($user->email)->send(new VerificationCodeEmail($user['OTP']));
+        $otp = rand(1000, 9999);
+        $user->update([
+            'OTP' => $otp,
+            'verification_code_expires_at' => now()->addMinutes(5),
+            'last_otp_at' => now(),
+            'failed_attempts' => 0,
+        ]);
+        SendOtpJob::dispatch($user, $data['OTP']);
     }
 
     public function login(array $data)
     {
         $user = $this->sanctumRepository->findUserByEmail($data['email']);
         return [
-            'token' => $this->generateToken($user),
+            'token' => $user->createToken('API Token')->plainTextToken,
             'user' => $user
         ];
     }
@@ -124,7 +127,7 @@ class SanctumService
         ];
     }
 
-    public function generateToken(User $user)
+    public function generateToken($user)
     {
         return $user->createToken('api_token')->plainTextToken;
     }

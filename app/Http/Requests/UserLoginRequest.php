@@ -23,7 +23,8 @@ class UserLoginRequest extends FormRequest
     {
         return [
             'email' => ['required', 'email', 'string'],
-            'password' => ['required', 'string', 'min:8', new \App\Rules\ValidCredentials($this->input('email'))],
+            // 'password' => ['required', 'string', 'min:8'], new \App\Rules\ValidCredentials($this->input('email'))],
+            'password' => ['required', 'string', 'min:8'],
         ];
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Requests\UserRegisterRequest;
 use App\Http\Resources\SanctumResource;
 use App\Http\Helpers\ApiResponse;
 use App\Services\SanctumService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SanctumController extends Controller
@@ -27,6 +28,13 @@ class SanctumController extends Controller
     {
         $token = $this->sanctumService->verifyOTP($request->validated());
         return ApiResponse::successWithData($token, 'Email verified successfully.');
+    }
+
+    public function reSendOTP(Request $request)
+    {
+        $validatedEmail = $request->validate(['email' => 'required|email|string']);
+        $this->sanctumService->reSendOTP($validatedEmail);
+        return ApiResponse::success('A new verification code has been sent to your email. Please check your email.');
     }
 
     public function login(UserLoginRequest $request)

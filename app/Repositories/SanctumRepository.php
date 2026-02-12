@@ -16,7 +16,9 @@ class SanctumRepository implements SanctumRepositoryInterface
 
     public function findUserByEmail(string $email): ?User
     {
-        return $this->user->where('email', $email)->first();
+        return $this->user->where('email', $email)
+            ->select(['id', 'email', 'password', 'name'])
+            ->first();
     }
 
     public function deleteUserTokens(User $user): bool
